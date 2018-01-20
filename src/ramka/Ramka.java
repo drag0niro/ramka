@@ -22,6 +22,12 @@ public class Ramka extends JFrame
     }
     
     
+ public void initComponents()
+ {
+     
+     
+ }
+    
     public static void main(String[] args) 
     {
         new Ramka();
