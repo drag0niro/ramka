@@ -2,6 +2,7 @@ package ramka;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.GregorianCalendar;
 
 
 /**
@@ -29,11 +30,6 @@ public class Ramka extends JFrame
     
     public void initComponents()
     {
-//        Container container = this.getContentPane(); //Pobieranie szybki i przypisanie jej do kontenera
-//        container.setLayout(null);
-//        container.add(buttonPageEnd);
-//        buttonPageEnd.setSize(buttonPageEnd.getPreferredSize());
-//        buttonPageEnd.setLocation(200, 200);
         
         /**
          * @since 1.02
@@ -42,38 +38,80 @@ public class Ramka extends JFrame
         GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
         
-        layout.setHorizontalGroup( //Grupa pozioma
+        layout.setVerticalGroup( //Grupa pozioma
                 layout.createSequentialGroup()
-//                .addComponent(button1, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE) // 1. Minimalna wielkośc, 2. Preferowana wielkość, 3. Maksymalna wielkość
-//                .addGroup(
-//                    layout.createParallelGroup().
-//                            addComponent(button2, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE).
-//                            addComponent(button4, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
-//                 )
-//                .addComponent(button3, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                .addComponent(time)
                 .addContainerGap(10, Short.MAX_VALUE) //Przerwa, żeby umieścić przycisk na dole strony
                 .addComponent(buttonPageEnd, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+
         );
         
-        layout.setVerticalGroup( //Grupa pionowa
+        layout.setHorizontalGroup( //Grupa pionowa
                 layout.createSequentialGroup()
-//                .addGroup(
-//                layout.createParallelGroup()
-//                        .addComponent(button1, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
-//                        .addComponent(button2, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
-//                        .addComponent(button3, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
-//                )
-//                .addComponent(button4, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
                 .addContainerGap(10, Short.MAX_VALUE) //Przerwa, żeby umieścić przycisk na dole strony
-                .addComponent(buttonPageEnd, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                .addGroup(layout.createParallelGroup()
+                .addComponent(time)
+                .addComponent(buttonPageEnd, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE))
+                
+                
+
+
         );
        
         layout.setAutoCreateGaps(true); //Dodawanie odstępów między buttonami
         layout.setAutoCreateContainerGaps(true); //Dodawanie odstępów między kontenerami
         
 
-        buttonPageEnd.addActionListener(new colorListener(Color.BLACK));
+        buttonPageEnd.addActionListener(new colorListener(Color.RED));
+        panel.add(time);
+        
+        ActionListener stoper = new Clock();
+        Timer clock = new Timer(1000, stoper);
+        clock.start();
 
+    }
+    
+    private class Clock implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent ae) 
+        {
+            time.setText(getTime());
+        }
+    }
+    
+    public String getTime()
+    {
+        GregorianCalendar calendar = new GregorianCalendar();
+        String day = "" + calendar.get(GregorianCalendar.DAY_OF_WEEK);
+        String h = "" + calendar.get(GregorianCalendar.HOUR_OF_DAY);
+        String min = "" + calendar.get(GregorianCalendar.MINUTE);
+        String sec = "" + calendar.get(GregorianCalendar.SECOND);
+        
+        if (Integer.parseInt(day) == 2)
+            day = "Monday";
+        else if (Integer.parseInt(day) == 3)
+            day = "Tuesday";
+        else if (Integer.parseInt(day) == 4)
+            day = "Wednesday";
+        else if (Integer.parseInt(day) == 5)
+            day = "Thursday";
+        else if (Integer.parseInt(day) == 6)
+            day = "Friday";
+        else if (Integer.parseInt(day) == 7)
+            day = "Saturday";
+        else if (Integer.parseInt(day) == 1)
+            day = "Sunday";
+        
+        
+        if (Integer.parseInt(h) < 10)
+            h = "0" + h;
+        if (Integer.parseInt(min) < 10)
+            min = "0" + min;
+        if (Integer.parseInt(sec) < 10)
+            sec = "0" + sec;
+        
+        return (day + ", " + h + " : " + min + " : " + sec);
     }
     
     private class colorListener implements ActionListener
@@ -94,11 +132,8 @@ public class Ramka extends JFrame
     }
     
     JPanel panel = new JPanel();
-    JButton buttonPageEnd = new JButton("Zmiana tła na kolor czarny"); //Zainicjowanie przycisku z napisem
-//    JButton button1 = new JButton("B1"); //Zainicjowanie przycisku z napisem
-//    JButton button2 = new JButton("B2"); //Zainicjowanie przycisku z napisem
-//    JButton button3 = new JButton("B3"); //Zainicjowanie przycisku z napisem
-//    JButton button4 = new JButton("B4"); //Zainicjowanie przycisku z napisem
+    JButton buttonPageEnd = new JButton("RED Background"); //Zainicjowanie przycisku z napisem
+    JLabel time = new JLabel(getTime());
     
     
     public static void main(String[] args) 
