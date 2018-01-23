@@ -40,7 +40,7 @@ public class Ramka extends JFrame
         
         layout.setVerticalGroup( //Grupa pozioma
                 layout.createSequentialGroup()
-                .addComponent(time)
+                .addComponent(time, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
                 .addContainerGap(10, Short.MAX_VALUE) //Przerwa, żeby umieścić przycisk na dole strony
                 .addComponent(buttonPageEnd, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
 
@@ -49,8 +49,8 @@ public class Ramka extends JFrame
         layout.setHorizontalGroup( //Grupa pionowa
                 layout.createSequentialGroup()
                 .addContainerGap(10, Short.MAX_VALUE) //Przerwa, żeby umieścić przycisk na dole strony
-                .addGroup(layout.createParallelGroup()
-                .addComponent(time)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                .addComponent(time, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
                 .addComponent(buttonPageEnd, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE))
                 
                 
@@ -132,7 +132,7 @@ public class Ramka extends JFrame
     }
     
     JPanel panel = new JPanel();
-    JButton buttonPageEnd = new JButton("RED Background"); //Zainicjowanie przycisku z napisem
+    JButton buttonPageEnd = new JButton("START"); //Zainicjowanie przycisku z napisem
     JLabel time = new JLabel(getTime());
     
     
