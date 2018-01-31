@@ -34,6 +34,7 @@ public class Ramka extends JFrame
         /**
          * @since 1.02
          */
+        this.getContentPane().add(suwaki);
         this.getContentPane().add(panel); 
         GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
@@ -41,20 +42,22 @@ public class Ramka extends JFrame
         layout.setVerticalGroup( //Grupa pozioma
                 layout.createSequentialGroup()
                 .addComponent(time, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                .addComponent(suwaki, 550, 550, 550)
                 .addContainerGap(10, Short.MAX_VALUE) //Przerwa, żeby umieścić przycisk na dole strony
+                .addComponent(zaznaczenie, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
                 .addComponent(buttonPageEnd, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+
 
         );
         
         layout.setHorizontalGroup( //Grupa pionowa
                 layout.createSequentialGroup()
+                .addComponent(suwaki, 900, 900, 900)
                 .addContainerGap(10, Short.MAX_VALUE) //Przerwa, żeby umieścić przycisk na dole strony
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                 .addComponent(time, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
-                .addComponent(buttonPageEnd, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE))
-                
-                
-
+                .addComponent(buttonPageEnd, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                .addComponent(zaznaczenie, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE))
 
         );
        
@@ -63,11 +66,13 @@ public class Ramka extends JFrame
         
 
         buttonPageEnd.addActionListener(new colorListener(Color.RED));
-        panel.add(time);
+        panel.add(time, BorderLayout.PAGE_END);
+        zaznaczenie.addActionListener(new zaznaczenieListener());
         
         ActionListener stoper = new Clock();
         Timer clock = new Timer(1000, stoper);
         clock.start();
+        
 
     }
     
@@ -114,6 +119,25 @@ public class Ramka extends JFrame
         return (day + ", " + h + " : " + min + " : " + sec);
     }
     
+    
+    private class zaznaczenieListener implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent ae) 
+        {  
+//            obszarTekstowy.insert("No siemanko! ", 0);
+//            obszarTekstowy.replaceRange("Siema", 0, 20);
+            int opcja = JOptionPane.showConfirmDialog(rootPane, "Czy na pewno chcesz zaznaczyć cały tekst?", "Uwaga", JOptionPane.YES_NO_OPTION);
+            if (opcja == 0)
+            {
+                obszarTekstowy.select(0, obszarTekstowy.getText().length());   //To samo co .selectAll()
+                zaznaczenie.transferFocusBackward(); //Bez tego nie działa zaznaczenie, focus zostaje dalej na przycisku
+                System.out.println(obszarTekstowy.getSelectionStart());
+            }
+        }
+
+    }
+    
     private class colorListener implements ActionListener
     {
         public colorListener(Color color)
@@ -125,15 +149,16 @@ public class Ramka extends JFrame
         public void actionPerformed(ActionEvent event)
         {
             panel.setBackground(color);
-
-        }
-        
+        }        
         Color color;
     }
     
-    JPanel panel = new JPanel();
-    JButton buttonPageEnd = new JButton("START"); //Zainicjowanie przycisku z napisem
-    JLabel time = new JLabel(getTime());
+    private JPanel panel = new JPanel();
+    private JButton buttonPageEnd = new JButton("START"); //Zainicjowanie przycisku z napisem
+    private JButton zaznaczenie = new JButton("Zaznacz wszystko");
+    private JLabel time = new JLabel(getTime());
+    private JTextArea obszarTekstowy = new JTextArea("Jak narazie wszystko działa!");
+    private JScrollPane suwaki = new JScrollPane(obszarTekstowy);
     
     
     public static void main(String[] args) 
