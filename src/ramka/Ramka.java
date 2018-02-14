@@ -44,9 +44,12 @@ public class Ramka extends JFrame
                 layout.createSequentialGroup()
                 .addComponent(time, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
                 .addComponent(suwaki, 550, 550, 550)
-            //    .addComponent(wyborSciezki, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+
                 .addContainerGap(10, Short.MAX_VALUE) //Przerwa, żeby umieścić przycisk na dole strony
-                .addComponent(zaznaczenie, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                .addGroup(layout.createParallelGroup()
+                .addComponent(szukajFolderow, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                .addComponent(szukajWszystkiego, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE))
+
                 .addComponent(buttonPageEnd, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
 
 
@@ -56,11 +59,14 @@ public class Ramka extends JFrame
                 layout.createSequentialGroup()
                 .addComponent(suwaki, 900, 900, 900)
                 .addContainerGap(10, Short.MAX_VALUE) //Przerwa, żeby umieścić przycisk na dole strony
-              //  .addComponent(wyborSciezki, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                 .addComponent(time, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
                 .addComponent(buttonPageEnd, GroupLayout.DEFAULT_SIZE , GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
-                .addComponent(zaznaczenie, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE))
+                .addGroup(layout.createSequentialGroup()
+                .addComponent(szukajFolderow, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                .addComponent(szukajWszystkiego, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE))
+                )
 
         );
        
@@ -70,7 +76,8 @@ public class Ramka extends JFrame
 
         buttonPageEnd.addActionListener(new colorListener(Color.RED));
         panel.add(time, BorderLayout.PAGE_END);
-        zaznaczenie.addActionListener(new zaznaczenieListener());
+        szukajFolderow.addActionListener(new szukajFolderowListener());
+        szukajWszystkiego.addActionListener(new szukajWszystkiegoListener());
         
         ActionListener stoper = new Clock();
         Timer clock = new Timer(1000, stoper);
@@ -123,20 +130,39 @@ public class Ramka extends JFrame
     }
     
     
-    private class zaznaczenieListener implements ActionListener
+    private class szukajFolderowListener implements ActionListener
     {
         @Override
         public void actionPerformed(ActionEvent ae) 
         {  
 //            obszarTekstowy.insert("No siemanko! ", 0);
 //            obszarTekstowy.replaceRange("Siema", 0, 20);
-            String dysk = File.listRoots()[3].getAbsolutePath(); 
             int opcja = JOptionPane.showConfirmDialog(rootPane, "Czy na pewno chcesz wyszukać wszystkie foldery na dysku " + dysk + "?", "Uwaga", JOptionPane.YES_NO_OPTION);
             if (opcja == 0)
             {
                 folderyNaDysku(new File(dysk));
 //                obszarTekstowy.select(0, obszarTekstowy.getText().length());   //To samo co .selectAll()
-                zaznaczenie.transferFocusBackward(); //Bez tego nie działa zaznaczenie, focus zostaje dalej na przycisku
+                szukajFolderow.transferFocusBackward(); //Bez tego nie działa zaznaczenie, focus zostaje dalej na przycisku
+                System.out.println(obszarTekstowy.getSelectionStart());
+            }
+        }
+
+    }
+    
+     private class szukajWszystkiegoListener implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent ae) 
+        {  
+//            obszarTekstowy.insert("No siemanko! ", 0);
+//            obszarTekstowy.replaceRange("Siema", 0, 20);
+            
+            int opcja = JOptionPane.showConfirmDialog(rootPane, "Czy na pewno chcesz wyszukać wszystkie pliki i foldery na dysku " + dysk + "?", "Uwaga", JOptionPane.YES_NO_OPTION);
+            if (opcja == 0)
+            {
+                plikiIFolderyNaDysku(new File(dysk));
+//                obszarTekstowy.select(0, obszarTekstowy.getText().length());   //To samo co .selectAll()
+                szukajFolderow.transferFocusBackward(); //Bez tego nie działa zaznaczenie, focus zostaje dalej na przycisku
                 System.out.println(obszarTekstowy.getSelectionStart());
             }
         }
@@ -161,7 +187,24 @@ public class Ramka extends JFrame
     public void folderyNaDysku(File nazwaSciezki)
     {
         String[] nazwyFolderow = nazwaSciezki.list();
-        
+        obszarTekstowy.setText(null);
+        for (int i = 0; i < nazwyFolderow.length; ++i )
+        {
+            File p = new File(nazwaSciezki.getPath(), nazwyFolderow[i]);
+                    if (!p.isHidden())
+                    {
+                        String sciezka = p+" "+System.getProperty("line.separator");
+                        obszarTekstowy.append(sciezka); 
+                    }
+
+        }
+            
+    }
+    
+        public void plikiIFolderyNaDysku(File nazwaSciezki)
+    {
+        String[] nazwyFolderow = nazwaSciezki.list();
+        obszarTekstowy.setText(null);
         for (int i = 0; i < nazwyFolderow.length; ++i )
         {
             File p = new File(nazwaSciezki.getPath(), nazwyFolderow[i]);
@@ -177,12 +220,13 @@ public class Ramka extends JFrame
     
     private JPanel panel = new JPanel();
     private JButton buttonPageEnd = new JButton("Zapisz do pliku"); //Zainicjowanie przycisku z napisem
-    private JButton zaznaczenie = new JButton("Szukaj folderów");
+    private JButton szukajFolderow = new JButton("Szukaj folderów");
+    private JButton szukajWszystkiego = new JButton("Szukaj wszystkiego");
     private JLabel time = new JLabel(getTime());
     private JTextArea obszarTekstowy = new JTextArea();
     private JScrollPane suwaki = new JScrollPane(obszarTekstowy);
     private JFileChooser wyborSciezki = new JFileChooser();
-    
+    private String dysk = File.listRoots()[3].getAbsolutePath(); 
     
     public static void main(String[] args) 
     {
