@@ -3,7 +3,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.GregorianCalendar;
+import javax.swing.filechooser.FileSystemView;
 
 
 /**
@@ -74,7 +78,9 @@ public class Ramka extends JFrame
         layout.setAutoCreateContainerGaps(true); //Dodawanie odstępów między kontenerami
         
 
-        buttonPageEnd.addActionListener(new colorListener(Color.RED));
+        buttonPageEnd.addActionListener(new zapisDoPlikuListenter());
+        buttonPageEnd.setEnabled(false);
+        obszarTekstowy.setEditable(false);
         panel.add(time, BorderLayout.PAGE_END);
         szukajFolderow.addActionListener(new szukajFolderowListener());
         szukajWszystkiego.addActionListener(new szukajWszystkiegoListener());
@@ -94,6 +100,7 @@ public class Ramka extends JFrame
             time.setText(getTime());
         }
     }
+    
     
     public String getTime()
     {
@@ -135,15 +142,13 @@ public class Ramka extends JFrame
         @Override
         public void actionPerformed(ActionEvent ae) 
         {  
-//            obszarTekstowy.insert("No siemanko! ", 0);
-//            obszarTekstowy.replaceRange("Siema", 0, 20);
             int opcja = JOptionPane.showConfirmDialog(rootPane, "Czy na pewno chcesz wyszukać wszystkie foldery na dysku " + dysk + "?", "Uwaga", JOptionPane.YES_NO_OPTION);
             if (opcja == 0)
             {
                 folderyNaDysku(new File(dysk));
-//                obszarTekstowy.select(0, obszarTekstowy.getText().length());   //To samo co .selectAll()
                 szukajFolderow.transferFocusBackward(); //Bez tego nie działa zaznaczenie, focus zostaje dalej na przycisku
                 System.out.println(obszarTekstowy.getSelectionStart());
+                buttonPageEnd.setEnabled(true);
             }
         }
 
@@ -153,80 +158,107 @@ public class Ramka extends JFrame
     {
         @Override
         public void actionPerformed(ActionEvent ae) 
-        {  
-//            obszarTekstowy.insert("No siemanko! ", 0);
-//            obszarTekstowy.replaceRange("Siema", 0, 20);
-            
+        {              
             int opcja = JOptionPane.showConfirmDialog(rootPane, "Czy na pewno chcesz wyszukać wszystkie pliki i foldery na dysku " + dysk + "?", "Uwaga", JOptionPane.YES_NO_OPTION);
             if (opcja == 0)
             {
                 plikiIFolderyNaDysku(new File(dysk));
-//                obszarTekstowy.select(0, obszarTekstowy.getText().length());   //To samo co .selectAll()
                 szukajFolderow.transferFocusBackward(); //Bez tego nie działa zaznaczenie, focus zostaje dalej na przycisku
                 System.out.println(obszarTekstowy.getSelectionStart());
+                buttonPageEnd.setEnabled(true);
             }
         }
-
+        
     }
-    
-    private class colorListener implements ActionListener
+        
+    private class zapisDoPlikuListenter implements ActionListener
     {
-        public colorListener(Color color)
+
+        @Override
+        public void actionPerformed(ActionEvent e) 
         {
-            this.color = color;
+            try
+            {
+                FileSystemView filesys = FileSystemView.getFileSystemView();
+                File[] roots = filesys.getRoots();
+                File pulpit = filesys.getHomeDirectory();
+                PrintWriter zapis = new PrintWriter(new FileWriter(new File(pulpit,"Pliki z dysku " + nazwaDysku + ".txt")));
+                zapis.print(getTime());
+                zapis.println();
+                zapis.println();
+                zapis.print(obszarTekstowy.getText());
+                zapis.close();
+                JOptionPane.showMessageDialog(rootPane, "Pomyślnie wykonano zapis na " + pulpit);
+            }
+            catch (IOException ex)
+            {
+                System.out.println(ex.getMessage()); 
+            }
+               
         }
         
-        @Override
-        public void actionPerformed(ActionEvent event)
-        {
-            panel.setBackground(color);
-        }        
-        Color color;
     }
     
     public void folderyNaDysku(File nazwaSciezki)
     {
+        int liczba = 0;
         String[] nazwyFolderow = nazwaSciezki.list();
         obszarTekstowy.setText(null);
+        obszarTekstowy.append("Foldery na dysku " + dysk);
+        obszarTekstowy.append(System.getProperty("line.separator"));
+        obszarTekstowy.append(System.getProperty("line.separator"));
+        
         for (int i = 0; i < nazwyFolderow.length; ++i )
         {
             File p = new File(nazwaSciezki.getPath(), nazwyFolderow[i]);
                     if (!p.isHidden())
                     {
                         String sciezka = p+" "+System.getProperty("line.separator");
+                        sciezka = sciezka.substring(3);
                         obszarTekstowy.append(sciezka); 
                     }
-
+        liczba++;
         }
+        obszarTekstowy.append(System.getProperty("line.separator"));
+        obszarTekstowy.append("Liczba folderów na dysku " + nazwaDysku + ": " + liczba);
             
     }
     
         public void plikiIFolderyNaDysku(File nazwaSciezki)
     {
+        int liczba = 0;
         String[] nazwyFolderow = nazwaSciezki.list();
         obszarTekstowy.setText(null);
+        obszarTekstowy.append("Pliki i foldery na dysku " + dysk);
+        obszarTekstowy.append(System.getProperty("line.separator"));
+        obszarTekstowy.append(System.getProperty("line.separator"));
+        
         for (int i = 0; i < nazwyFolderow.length; ++i )
         {
             File p = new File(nazwaSciezki.getPath(), nazwyFolderow[i]);
                     if (!p.isHidden())
                     {
                         String sciezka = p+" "+System.getProperty("line.separator");
+                        sciezka = sciezka.substring(3);
                         obszarTekstowy.append(sciezka); 
                     }
-
+        liczba++;           
         }
-            
+        obszarTekstowy.append(System.getProperty("line.separator"));
+        obszarTekstowy.append("Liczba folderów i plików na dysku " + nazwaDysku + ": " + liczba);    
     }
     
     private JPanel panel = new JPanel();
-    private JButton buttonPageEnd = new JButton("Zapisz do pliku"); //Zainicjowanie przycisku z napisem
+    private JButton buttonPageEnd = new JButton("Zapisz listę na pulpicie"); //Zainicjowanie przycisku z napisem
     private JButton szukajFolderow = new JButton("Szukaj folderów");
     private JButton szukajWszystkiego = new JButton("Szukaj wszystkiego");
     private JLabel time = new JLabel(getTime());
     private JTextArea obszarTekstowy = new JTextArea();
     private JScrollPane suwaki = new JScrollPane(obszarTekstowy);
     private JFileChooser wyborSciezki = new JFileChooser();
-    private String dysk = File.listRoots()[3].getAbsolutePath(); 
+    private String dysk = File.listRoots()[2].getAbsolutePath();
+    private String nazwaDysku = dysk.substring(0, 1);
+
     
     public static void main(String[] args) 
     {
