@@ -201,39 +201,39 @@ public class Ramka extends JFrame
     
     public void folderyNaDysku(File nazwaSciezki)
     {
-        int liczba = 0;
-        String[] nazwyFolderow = nazwaSciezki.list();
         obszarTekstowy.setText(null);
         obszarTekstowy.append("Foldery na dysku " + dysk);
         obszarTekstowy.append(System.getProperty("line.separator"));
         obszarTekstowy.append(System.getProperty("line.separator"));
         
-        for (int i = 0; i < nazwyFolderow.length; ++i )
-        {
-            File p = new File(nazwaSciezki.getPath(), nazwyFolderow[i]);
-                    if (!p.isHidden())
-                    {
-                        String sciezka = p+" "+System.getProperty("line.separator");
-                        sciezka = sciezka.substring(3);
-                        obszarTekstowy.append(sciezka); 
-                    }
-        liczba++;
-        }
+        wyszukiwarka(nazwaSciezki, true);
+        
         obszarTekstowy.append(System.getProperty("line.separator"));
-        obszarTekstowy.append("Liczba folderów na dysku " + nazwaDysku + ": " + liczba);
+        obszarTekstowy.append("Liczba folderów na dysku " + nazwaDysku + ": " + liczbaFolderow);
             
     }
     
         public void plikiIFolderyNaDysku(File nazwaSciezki)
     {
-        int liczba = 0;
-        String[] nazwyFolderow = nazwaSciezki.list();
         obszarTekstowy.setText(null);
         obszarTekstowy.append("Pliki i foldery na dysku " + dysk);
         obszarTekstowy.append(System.getProperty("line.separator"));
         obszarTekstowy.append(System.getProperty("line.separator"));
         
-        for (int i = 0; i < nazwyFolderow.length; ++i )
+        wyszukiwarka(nazwaSciezki, false);
+        
+        obszarTekstowy.append(System.getProperty("line.separator"));
+        obszarTekstowy.append("Liczba folderów na dysku " + nazwaDysku + ": " + liczbaFolderow); 
+        obszarTekstowy.append(System.getProperty("line.separator"));
+        obszarTekstowy.append("Liczba plików na dysku " + nazwaDysku + ": " + liczbaPlikow); 
+    }
+        
+    public void wyszukiwarka(File nazwaSciezki, boolean czySameFoldery)
+    {
+    int liczbaFolderow = 0;
+    int liczbaPlikow = 0;
+    String[] nazwyFolderow = nazwaSciezki.list(); 
+     for (int i = 0; i < nazwyFolderow.length; ++i )
         {
             File p = new File(nazwaSciezki.getPath(), nazwyFolderow[i]);
                     if (!p.isHidden())
@@ -241,11 +241,17 @@ public class Ramka extends JFrame
                         String sciezka = p+" "+System.getProperty("line.separator");
                         sciezka = sciezka.substring(3);
                         obszarTekstowy.append(sciezka); 
+                        
+                        if(!czySameFoldery && p.isDirectory())
+                        {
+                            liczbaPlikow++;
+                            wyszukiwarka(new File(p.getPath()), false);
+                        }
                     }
-        liczba++;           
+        liczbaFolderow++;           
         }
-        obszarTekstowy.append(System.getProperty("line.separator"));
-        obszarTekstowy.append("Liczba folderów i plików na dysku " + nazwaDysku + ": " + liczba);    
+    this.liczbaFolderow = liczbaFolderow;
+    this.liczbaPlikow += liczbaPlikow;
     }
     
     private JPanel panel = new JPanel();
@@ -258,7 +264,8 @@ public class Ramka extends JFrame
     private JFileChooser wyborSciezki = new JFileChooser();
     private String dysk = File.listRoots()[2].getAbsolutePath();
     private String nazwaDysku = dysk.substring(0, 1);
-
+    private int liczbaPlikow;
+    private int liczbaFolderow;
     
     public static void main(String[] args) 
     {
