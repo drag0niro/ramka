@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.GregorianCalendar;
 import javax.swing.filechooser.FileSystemView;
 
@@ -147,7 +150,6 @@ public class Ramka extends JFrame
             {
                 folderyNaDysku(new File(dysk));
                 szukajFolderow.transferFocusBackward(); //Bez tego nie działa zaznaczenie, focus zostaje dalej na przycisku
-                System.out.println(obszarTekstowy.getSelectionStart());
                 buttonPageEnd.setEnabled(true);
             }
         }
@@ -164,7 +166,6 @@ public class Ramka extends JFrame
             {
                 plikiIFolderyNaDysku(new File(dysk));
                 szukajFolderow.transferFocusBackward(); //Bez tego nie działa zaznaczenie, focus zostaje dalej na przycisku
-                System.out.println(obszarTekstowy.getSelectionStart());
                 buttonPageEnd.setEnabled(true);
             }
         }
@@ -201,6 +202,8 @@ public class Ramka extends JFrame
     
     public void folderyNaDysku(File nazwaSciezki)
     {
+        this.liczbaFolderow = 0;
+        this.liczbaPlikow = 0;
         obszarTekstowy.setText(null);
         obszarTekstowy.append("Foldery na dysku " + dysk);
         obszarTekstowy.append(System.getProperty("line.separator"));
@@ -208,13 +211,23 @@ public class Ramka extends JFrame
         
         wyszukiwarka(nazwaSciezki, true);
         
+        List<String> sublist = lista.subList(0, lista.size()); 
+        Collections.sort(sublist);
+                        
+        String bezNawiasow = sublist.toString().substring(1);
+        String posortowane = bezNawiasow.substring(0, bezNawiasow.length()-1);
+        posortowane = posortowane.replace(", ", "");
+        obszarTekstowy.append(posortowane); 
+        
         obszarTekstowy.append(System.getProperty("line.separator"));
         obszarTekstowy.append("Liczba folderów na dysku " + nazwaDysku + ": " + liczbaFolderow);
-            
+        sublist.clear();    
     }
     
         public void plikiIFolderyNaDysku(File nazwaSciezki)
     {
+        this.liczbaFolderow = 0;
+        this.liczbaPlikow = 0;
         obszarTekstowy.setText(null);
         obszarTekstowy.append("Pliki i foldery na dysku " + dysk);
         obszarTekstowy.append(System.getProperty("line.separator"));
@@ -222,10 +235,19 @@ public class Ramka extends JFrame
         
         wyszukiwarka(nazwaSciezki, false);
         
+        List<String> sublist = lista.subList(0, lista.size()); 
+        Collections.sort(sublist);
+                        
+        String bezNawiasow = sublist.toString().substring(1);
+        String posortowane = bezNawiasow.substring(0, bezNawiasow.length()-1);
+        posortowane = posortowane.replace(", ", "");
+        obszarTekstowy.append(posortowane); 
+        
         obszarTekstowy.append(System.getProperty("line.separator"));
         obszarTekstowy.append("Liczba folderów na dysku " + nazwaDysku + ": " + liczbaFolderow); 
         obszarTekstowy.append(System.getProperty("line.separator"));
         obszarTekstowy.append("Liczba plików na dysku " + nazwaDysku + ": " + liczbaPlikow); 
+        sublist.clear();
     }
         
     public void wyszukiwarka(File nazwaSciezki, boolean czySameFoldery)
@@ -240,11 +262,12 @@ public class Ramka extends JFrame
                     {
                         String sciezka = p+" "+System.getProperty("line.separator");
                         sciezka = sciezka.substring(3);
-                        obszarTekstowy.append(sciezka); 
+                        lista.add(sciezka);
+                        
+                        liczbaPlikow++;
                         
                         if(!czySameFoldery && p.isDirectory())
                         {
-                            liczbaPlikow++;
                             wyszukiwarka(new File(p.getPath()), false);
                         }
                     }
@@ -266,6 +289,7 @@ public class Ramka extends JFrame
     private String nazwaDysku = dysk.substring(0, 1);
     private int liczbaPlikow;
     private int liczbaFolderow;
+    ArrayList lista = new ArrayList();
     
     public static void main(String[] args) 
     {
